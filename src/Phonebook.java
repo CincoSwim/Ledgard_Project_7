@@ -21,9 +21,10 @@ public class Phonebook {
         System.out.println("Loading...");
         index = ReadPhoneBook();
         System.out.println();
-        System.out.println("Enter: e | List: l | Find: f | Quit: q ");
+
 
         while (!(quitCondition == 'q')) {
+            System.out.println("Enter: e | List: l | Find: f | Quit: q ");
             System.out.print("Command: ");
             commandEntry = input.nextLine();
 
@@ -118,8 +119,8 @@ public class Phonebook {
             nameLower = entryList[i].name.toLowerCase();
             if (nameLower.contains(queryLower)) {
                 System.out.println();
-                System.out.println("-- " + entryList[i].name);
-                System.out.println("-- " + String.valueOf(entryList[i].number).replaceFirst
+                System.out.println("Name: " + entryList[i].name);
+                System.out.println("Notes: " + String.valueOf(entryList[i].number).replaceFirst
                         ("(\\d{3})(\\d{3})(\\d+)", "($1)-$2-$3"));
                 System.out.println();
                 entryFound = true;
