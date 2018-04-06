@@ -1,5 +1,7 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.Scanner;
-import java.io.*;
 
 public class Phonebook {
     static int index;
@@ -13,15 +15,13 @@ public class Phonebook {
         boolean qSuccess;
 
         entryList = new Entry[200];
-        index = 0;
         quitCondition = 'a';
         Scanner input = new Scanner(System.in);
 
         System.out.println("Loading...");
-        ReadPhoneBook();
-        System.out.println("Now Loaded!");
+        index = ReadPhoneBook();
         System.out.println();
-        System.out.println("Enter: e | List: l | Find: f | Quit: q");
+        System.out.println("Enter: e | List: l | Find: f | Quit: q ");
 
         while (!(quitCondition == 'q')) {
             System.out.print("Command: ");
@@ -42,12 +42,13 @@ public class Phonebook {
 
                 case 'f':
                     query = commandEntry.substring(2);
-                    qSuccess = Entry.findEntry(query, entryList, index);
+                    qSuccess = findEntry(query);
                     if (!qSuccess)
-                        System.out.println("No matching entries.");
+                        System.out.println("** No entry found for " + query);
                     break;
                 case 'l':
-                    Entry.listEntries(entryList, index);
+                    System.out.println();
+                    listEntries();
                     break;
 
                 case 'q':
@@ -65,15 +66,69 @@ public class Phonebook {
     public static void WritePhoneBook() throws FileNotFoundException {
         PrintStream P = new PrintStream("phonebook.txt");
         for (int i = 0; i < index; i++) {
-            P.println(entryList[i].name + "\t" +
-                    entryList[i].number + "\t" +
-                    entryList[i].notes);
+            P.println(entryList[i].name);
+            P.println(entryList[i].number);
+            P.println(entryList[i].notes);
         }
         P.close();
         System.out.println("Phonebook Saved");
     }
 
-    public static void ReadPhoneBook() throws FileNotFoundException{
-       // Scanner filein = new Scanner ();
+    public static int ReadPhoneBook() throws FileNotFoundException {
+        Scanner read = new Scanner(new File("phonebook.txt"));
+        String name, notes, numberTemp;
+        long number;
+
+        index = 0;
+        try {
+
+
+            for (int i = 0; i < 200; i++) {
+                name = read.nextLine();
+                numberTemp = read.nextLine();
+                notes = read.nextLine();
+                number = Long.parseLong(numberTemp);
+                entryList[i] = new Entry(name, number, notes);
+                index++;
+
+            }
+        } catch (Exception NoSuchElementException) {
+            System.out.println("Now Loaded!");
+            return index;
+        }
+        return index;
     }
+
+    public static void listEntries() {
+        for (int i = 0; i < index; i++) {
+            System.out.println("Name: " + entryList[i].name);
+            System.out.println("Phone Number: " + String.valueOf(entryList[i].number).replaceFirst
+                    ("(\\d{3})(\\d{3})(\\d+)", "($1)-$2-$3"));
+            System.out.println("Notes: " + entryList[i].notes);
+            System.out.println();
+        }
+    }
+
+    public static boolean findEntry(String query) {
+        boolean entryFound;
+        entryFound = false;
+        String nameLower, queryLower;
+        for (int i = 0; i < index; i++) {
+            queryLower = query.toLowerCase();
+            nameLower = entryList[i].name.toLowerCase();
+            if (nameLower.contains(queryLower)) {
+                System.out.println();
+                System.out.println("-- " + entryList[i].name);
+                System.out.println("-- " + String.valueOf(entryList[i].number).replaceFirst
+                        ("(\\d{3})(\\d{3})(\\d+)", "($1)-$2-$3"));
+                System.out.println();
+                entryFound = true;
+            }
+        }
+
+
+        return entryFound;
+    }
+
 }
+
